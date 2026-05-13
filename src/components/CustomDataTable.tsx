@@ -1,6 +1,6 @@
 // components/CustomDataTable.tsx
 import React from "react";
-import DataTable, { TableProps } from "react-data-table-component";
+import DataTable, { TableProps, TableColumn } from "react-data-table-component";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "@/hooks/useTheme";
 import LoadingState from "@/components/LoadingState";
@@ -19,21 +19,21 @@ const useCustomStyles = (
   headRow: {
     style: {
       backgroundColor: primaryTableColor,
-      minHeight: "48px",
+      minHeight: "52px",
       borderBottom: `1px solid ${primaryTableColor}50`,
     },
   },
   headCells: {
     style: {
       color: secondaryTextColor,
-      fontSize: "14px",
+      fontSize: "13px",
       fontWeight: "600",
       padding: "12px 16px",
     },
   },
   rows: {
     style: {
-      minHeight: "48px",
+      minHeight: "56px",
       borderBottom: `1px solid ${primaryTableColor}20`,
       fontSize: "14px",
       color: primaryTextColor,
@@ -60,6 +60,7 @@ const useCustomStyles = (
       borderTop: `1px solid ${primaryTableColor}20`,
       color: primaryTextColor,
       minHeight: "56px",
+      padding: "8px",
     },
     pageButtonsStyle: {
       borderRadius: "5px",
@@ -109,6 +110,7 @@ const CustomDataTable = <T,>({
   title,
   description,
   progressPending,
+  columns,
   ...props
 }: CustomDataTableProps<T>) => {
   const { primaryTableColor, secondaryTableColor, primaryTextColor, secondaryTextColor } =
@@ -120,6 +122,29 @@ const CustomDataTable = <T,>({
     primaryTextColor,
     secondaryTextColor
   );
+
+  // Process columns to handle center alignment properly
+  const processedColumns = columns?.map((col: any) => {
+    const { center, ...rest } = col;
+    
+    // If center is true, add style to center the content
+    if (center) {
+      return {
+        ...rest,
+        style: {
+          ...rest.style,
+          justifyContent: "center",
+        },
+        // Also add center style to header
+        headerStyle: {
+          ...rest.headerStyle,
+          justifyContent: "center",
+        },
+      };
+    }
+    
+    return col;
+  });
 
   return (
     <Card className="overflow-hidden border-white/40 bg-white/70 backdrop-blur-sm">
@@ -136,6 +161,7 @@ const CustomDataTable = <T,>({
       <CardContent className="p-0">
         <DataTable
           {...props}
+          columns={processedColumns as TableColumn<T>[]}
           customStyles={customStyles}
           responsive
           highlightOnHover

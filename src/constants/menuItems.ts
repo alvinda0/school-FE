@@ -65,7 +65,7 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
   // === USERS ===
   {
     name: "users",
-    title: "List User",
+    title: "Pengguna",
     href: "/users",
     icon: Users,
     roles: ["super_admin", "admin"],
@@ -74,7 +74,7 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
   // === STUDENTS ===
   {
     name: "students",
-    title: "List Student",
+    title: "Siswa",
     href: "/students",
     icon: User,
     roles: ["super_admin", "admin", "teacher"],
@@ -83,7 +83,7 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
   // === TEACHERS ===
   {
     name: "teachers",
-    title: "List Teacher",
+    title: "Guru",
     href: "/teachers",
     icon: Users,
     roles: ["super_admin", "admin"],
@@ -92,7 +92,7 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
   // === SUBJECTS ===
   {
     name: "subjects",
-    title: "List Subject",
+    title: "Mata Pelajaran",
     href: "/subjects",
     icon: BookIcon,
     roles: ["super_admin", "admin", "teacher"],

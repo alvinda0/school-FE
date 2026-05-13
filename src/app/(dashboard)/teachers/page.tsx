@@ -1,28 +1,27 @@
-// app/(dashboard)/students/page.tsx
+// app/(dashboard)/teachers/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomDataTable from "@/components/CustomDataTable";
-import { studentService } from "@/services/student.service";
-import { Student } from "@/types/student";
+import { teacherService } from "@/services/teacher.service";
+import { Teacher } from "@/types/teacher";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ActionDropdown } from "@/components/ActionDropdown";
 
-const StudentsPage = () => {
+const TeachersPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  // Fetch students data
+  // Fetch teachers data
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["students"],
-    queryFn: () => studentService.getStudents(),
+    queryKey: ["teachers"],
+    queryFn: () => teacherService.getTeachers(),
   });
 
   // Client-side pagination
@@ -42,12 +41,10 @@ const StudentsPage = () => {
   };
 
   // Status badge component
-  const StatusBadge = ({ status }: { status: Student["status"] }) => {
-    const variants: Record<Student["status"], { variant: any; label: string }> = {
+  const StatusBadge = ({ status }: { status: Teacher["status"] }) => {
+    const variants: Record<Teacher["status"], { variant: any; label: string }> = {
       ACTIVE: { variant: "default", label: "Active" },
       INACTIVE: { variant: "secondary", label: "Inactive" },
-      GRADUATED: { variant: "outline", label: "Graduated" },
-      DROPPED_OUT: { variant: "destructive", label: "Dropped Out" },
     };
 
     const config = variants[status] || variants.ACTIVE;
@@ -57,40 +54,48 @@ const StudentsPage = () => {
   // Table columns
   const columns = [
     {
-      name: "NIS",
-      selector: (row: Student) => row.nis,
-      sortable: true,
-      grow: 0.8,
-      minWidth: "100px",
-    },
-    {
-      name: "NISN",
-      selector: (row: Student) => row.nisn,
+      name: "NIP",
+      selector: (row: Teacher) => row.nip,
       sortable: true,
       grow: 1,
       minWidth: "120px",
     },
     {
+      name: "Full Name",
+      selector: (row: Teacher) => row.user.full_name,
+      sortable: true,
+      grow: 1.5,
+      minWidth: "150px",
+    },
+    {
+      name: "Email",
+      selector: (row: Teacher) => row.user.email,
+      sortable: true,
+      grow: 1.8,
+      minWidth: "200px",
+    },
+    {
       name: "Gender",
-      selector: (row: Student) => row.gender,
+      selector: (row: Teacher) => row.gender,
       sortable: true,
       grow: 0.8,
       minWidth: "100px",
     },
     {
-      name: "Birth Place",
-      selector: (row: Student) => row.birth_place,
+      name: "Phone",
+      selector: (row: Teacher) => row.phone_number || "-",
       sortable: true,
-      grow: 1,
+      grow: 1.2,
       minWidth: "130px",
     },
     {
       name: "Birth Date",
-      selector: (row: Student) => row.birth_date,
+      selector: (row: Teacher) => row.birth_date || "-",
       sortable: true,
       grow: 1,
       minWidth: "120px",
-      cell: (row: Student) => {
+      cell: (row: Teacher) => {
+        if (!row.birth_date) return "-";
         try {
           return format(new Date(row.birth_date), "dd MMM yyyy");
         } catch {
@@ -99,38 +104,31 @@ const StudentsPage = () => {
       },
     },
     {
-      name: "Phone",
-      selector: (row: Student) => row.phone_number,
-      sortable: true,
-      grow: 1.2,
-      minWidth: "130px",
-    },
-    {
       name: "Status",
-      selector: (row: Student) => row.status,
+      selector: (row: Teacher) => row.status,
       sortable: true,
       grow: 0.7,
       minWidth: "100px",
       center: true,
-      cell: (row: Student) => <StatusBadge status={row.status} />,
+      cell: (row: Teacher) => <StatusBadge status={row.status} />,
     },
     {
       name: "Actions",
       center: true,
       grow: 0.5,
       minWidth: "80px",
-      cell: (row: Student) => (
+      cell: (row: Teacher) => (
         <ActionDropdown
           actions={[
             {
               label: "View",
               icon: <Eye className="w-4 h-4" />,
-              onClick: () => router.push(`/students/${row.id}`),
+              onClick: () => router.push(`/teachers/${row.id}`),
             },
             {
               label: "Edit",
               icon: <Edit className="w-4 h-4" />,
-              onClick: () => router.push(`/students/${row.id}/edit`),
+              onClick: () => router.push(`/teachers/${row.id}/edit`),
             },
             {
               label: "Delete",
@@ -150,19 +148,19 @@ const StudentsPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Students Management
+            Teachers Management
           </h1>
           <p className="text-gray-500 mt-1">
-            Manage all students in the school
+            Manage all teachers in the school
           </p>
         </div>
-        <Button className="gap-2" onClick={() => router.push("/students/create")}>
+        <Button className="gap-2" onClick={() => router.push("/teachers/create")}>
           <Plus className="h-4 w-4" />
-          Add Student
+          Add Teacher
         </Button>
       </div>
 
-      {/* Students Table */}
+      {/* Teachers Table */}
       <CustomDataTable
         columns={columns}
         data={paginatedData}
@@ -180,4 +178,4 @@ const StudentsPage = () => {
   );
 };
 
-export default StudentsPage;
+export default TeachersPage;

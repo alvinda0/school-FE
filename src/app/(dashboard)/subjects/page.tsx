@@ -1,28 +1,26 @@
-// app/(dashboard)/students/page.tsx
+// app/(dashboard)/subjects/page.tsx
 "use client";
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomDataTable from "@/components/CustomDataTable";
-import { studentService } from "@/services/student.service";
-import { Student } from "@/types/student";
-import { Badge } from "@/components/ui/badge";
+import { subjectService } from "@/services/subject.service";
+import { Subject } from "@/types/subject";
 import { format } from "date-fns";
 import { ActionDropdown } from "@/components/ActionDropdown";
 
-const StudentsPage = () => {
+const SubjectsPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
-  // Fetch students data
+  // Fetch subjects data
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["students"],
-    queryFn: () => studentService.getStudents(),
+    queryKey: ["subjects"],
+    queryFn: () => subjectService.getSubjects(),
   });
 
   // Client-side pagination
@@ -41,99 +39,68 @@ const StudentsPage = () => {
     setPage(1);
   };
 
-  // Status badge component
-  const StatusBadge = ({ status }: { status: Student["status"] }) => {
-    const variants: Record<Student["status"], { variant: any; label: string }> = {
-      ACTIVE: { variant: "default", label: "Active" },
-      INACTIVE: { variant: "secondary", label: "Inactive" },
-      GRADUATED: { variant: "outline", label: "Graduated" },
-      DROPPED_OUT: { variant: "destructive", label: "Dropped Out" },
-    };
-
-    const config = variants[status] || variants.ACTIVE;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
-  };
-
   // Table columns
   const columns = [
     {
-      name: "NIS",
-      selector: (row: Student) => row.nis,
+      name: "Kode",
+      selector: (row: Subject) => row.code,
       sortable: true,
       grow: 0.8,
       minWidth: "100px",
     },
     {
-      name: "NISN",
-      selector: (row: Student) => row.nisn,
+      name: "Nama Mata Pelajaran",
+      selector: (row: Subject) => row.name,
       sortable: true,
-      grow: 1,
-      minWidth: "120px",
+      grow: 2,
+      minWidth: "200px",
     },
     {
-      name: "Gender",
-      selector: (row: Student) => row.gender,
+      name: "Deskripsi",
+      selector: (row: Subject) => row.description || "-",
       sortable: true,
-      grow: 0.8,
-      minWidth: "100px",
+      grow: 2.5,
+      minWidth: "250px",
+      cell: (row: Subject) => (
+        <span className="text-sm text-gray-600">
+          {row.description || "-"}
+        </span>
+      ),
     },
     {
-      name: "Birth Place",
-      selector: (row: Student) => row.birth_place,
+      name: "Dibuat Pada",
+      selector: (row: Subject) => row.created_at,
       sortable: true,
-      grow: 1,
-      minWidth: "130px",
-    },
-    {
-      name: "Birth Date",
-      selector: (row: Student) => row.birth_date,
-      sortable: true,
-      grow: 1,
-      minWidth: "120px",
-      cell: (row: Student) => {
+      grow: 1.2,
+      minWidth: "150px",
+      cell: (row: Subject) => {
         try {
-          return format(new Date(row.birth_date), "dd MMM yyyy");
+          return format(new Date(row.created_at), "dd MMM yyyy");
         } catch {
-          return row.birth_date;
+          return row.created_at;
         }
       },
     },
     {
-      name: "Phone",
-      selector: (row: Student) => row.phone_number,
-      sortable: true,
-      grow: 1.2,
-      minWidth: "130px",
-    },
-    {
-      name: "Status",
-      selector: (row: Student) => row.status,
-      sortable: true,
-      grow: 0.7,
-      minWidth: "100px",
-      center: true,
-      cell: (row: Student) => <StatusBadge status={row.status} />,
-    },
-    {
-      name: "Actions",
+      name: "Aksi",
       center: true,
       grow: 0.5,
       minWidth: "80px",
-      cell: (row: Student) => (
+      cell: (row: Subject) => (
         <ActionDropdown
           actions={[
             {
-              label: "View",
+              label: "Lihat",
               icon: <Eye className="w-4 h-4" />,
-              onClick: () => router.push(`/students/${row.id}`),
+              onClick: () => router.push(`/subjects/${row.id}`),
             },
             {
               label: "Edit",
               icon: <Edit className="w-4 h-4" />,
-              onClick: () => router.push(`/students/${row.id}/edit`),
+              onClick: () => router.push(`/subjects/${row.id}/edit`),
             },
             {
-              label: "Delete",
+              label: "Hapus",
               icon: <Trash2 className="w-4 h-4" />,
               onClick: () => console.log("Delete", row.id),
               className: "text-red-600 hover:bg-red-50",
@@ -150,19 +117,19 @@ const StudentsPage = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Students Management
+            Manajemen Mata Pelajaran
           </h1>
           <p className="text-gray-500 mt-1">
-            Manage all students in the school
+            Kelola semua mata pelajaran di sekolah
           </p>
         </div>
-        <Button className="gap-2" onClick={() => router.push("/students/create")}>
+        <Button className="gap-2" onClick={() => router.push("/subjects/create")}>
           <Plus className="h-4 w-4" />
-          Add Student
+          Tambah Mata Pelajaran
         </Button>
       </div>
 
-      {/* Students Table */}
+      {/* Subjects Table */}
       <CustomDataTable
         columns={columns}
         data={paginatedData}
@@ -180,4 +147,4 @@ const StudentsPage = () => {
   );
 };
 
-export default StudentsPage;
+export default SubjectsPage;
