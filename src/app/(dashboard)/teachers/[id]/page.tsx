@@ -1,22 +1,31 @@
 // app/(dashboard)/teachers/[id]/page.tsx
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Trash2, User, Phone, MapPin, Calendar, Mail } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, User, Phone, MapPin, Calendar, Mail, BookOpen, Plus, X } from "lucide-react";
 import { teacherService } from "@/services/teacher.service";
 import { Teacher } from "@/types/teacher";
 import { format } from "date-fns";
 import LoadingState from "@/components/LoadingState";
 import { ErrorState } from "@/components/ErrorState";
+import { DeleteTeacherModal } from "@/components/DeleteTeacherModal";
+import { AddTeacherSubjectsModal } from "@/components/AddTeacherSubjectsModal";
+import { RemoveTeacherSubjectsModal } from "@/components/RemoveTeacherSubjectsModal";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const TeacherDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const teacherId = params.id as string;
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddSubjectsModalOpen, setIsAddSubjectsModalOpen] = useState(false);
+  const [isRemoveSubjectsModalOpen, setIsRemoveSubjectsModalOpen] = useState(false);
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<string[]>([]);
 
   // Fetch teacher detail
   const { data, isLoading, error } = useQuery({
@@ -25,6 +34,32 @@ const TeacherDetailPage = () => {
   });
 
   const teacher = data?.data;
+  const teacherSubjects = teacher?.subjects || [];
+
+  // Handle subject selection
+  const handleToggleSubject = (subjectId: string) => {
+    setSelectedSubjectIds((prev) =>
+      prev.includes(subjectId)
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedSubjectIds.length === teacherSubjects.length) {
+      setSelectedSubjectIds([]);
+    } else {
+      setSelectedSubjectIds(teacherSubjects.map((s: any) => s.id));
+    }
+  };
+
+  const handleRemoveSelected = () => {
+    setIsRemoveSubjectsModalOpen(true);
+  };
+
+  const selectedSubjects = teacherSubjects.filter((s: any) =>
+    selectedSubjectIds.includes(s.id)
+  );
 
   // Status badge component
   const StatusBadge = ({ status }: { status: Teacher["status"] }) => {
@@ -71,6 +106,14 @@ const TeacherDetailPage = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => setIsAddSubjectsModalOpen(true)}
+          >
+            <BookOpen className="h-4 w-4" />
+            Tambah Mata Pelajaran
+          </Button>
           <Button 
             variant="outline" 
             className="gap-2"
@@ -79,7 +122,7 @@ const TeacherDetailPage = () => {
             <Edit className="h-4 w-4" />
             Edit
           </Button>
-          <Button variant="destructive" className="gap-2">
+          <Button variant="destructive" className="gap-2" onClick={() => setIsDeleteModalOpen(true)}>
             <Trash2 className="h-4 w-4" />
             Delete
           </Button>
@@ -179,6 +222,104 @@ const TeacherDetailPage = () => {
         </Card>
       </div>
 
+      {/* Subjects Section */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Mata Pelajaran yang Diajarkan
+            </CardTitle>
+            <div className="flex gap-2">
+              {teacherSubjects.length > 0 && selectedSubjectIds.length > 0 && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="gap-2"
+                    onClick={handleRemoveSelected}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Hapus ({selectedSubjectIds.length})
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={handleSelectAll}
+                  >
+                    Batal Pilih Semua
+                  </Button>
+                </>
+              )}
+              {teacherSubjects.length > 0 && selectedSubjectIds.length === 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSelectAll}
+                >
+                  Pilih Semua
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <LoadingState message="Memuat mata pelajaran..." />
+            </div>
+          ) : teacherSubjects.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <BookOpen className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+              <p className="font-medium">Belum ada mata pelajaran</p>
+              <p className="text-sm mt-1">
+                Klik tombol "Tambah Mata Pelajaran" untuk menambahkan
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {teacherSubjects.map((subject: any) => (
+                <div
+                  key={subject.id}
+                  className={`border rounded-lg p-4 transition-all ${
+                    selectedSubjectIds.includes(subject.id)
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <Checkbox
+                      id={`subject-${subject.id}`}
+                      checked={selectedSubjectIds.includes(subject.id)}
+                      onCheckedChange={() => handleToggleSubject(subject.id)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <label
+                        htmlFor={`subject-${subject.id}`}
+                        className="cursor-pointer"
+                      >
+                        <p className="font-semibold text-gray-900">
+                          {subject.code}
+                        </p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {subject.name}
+                        </p>
+                        {subject.description && (
+                          <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+                            {subject.description}
+                          </p>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Metadata */}
       <Card>
         <CardHeader>
@@ -204,6 +345,35 @@ const TeacherDetailPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Teacher Modal */}
+      <DeleteTeacherModal
+        teacher={teacher}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onDeleteSuccess={() => router.push("/teachers")}
+      />
+
+      {/* Add Subjects Modal */}
+      <AddTeacherSubjectsModal
+        teacherId={teacherId}
+        teacherName={teacher?.user.full_name || ""}
+        open={isAddSubjectsModalOpen}
+        onOpenChange={setIsAddSubjectsModalOpen}
+      />
+
+      {/* Remove Subjects Modal */}
+      <RemoveTeacherSubjectsModal
+        teacherId={teacherId}
+        subjects={selectedSubjects}
+        open={isRemoveSubjectsModalOpen}
+        onOpenChange={(open) => {
+          setIsRemoveSubjectsModalOpen(open);
+          if (!open) {
+            setSelectedSubjectIds([]);
+          }
+        }}
+      />
     </div>
   );
 };

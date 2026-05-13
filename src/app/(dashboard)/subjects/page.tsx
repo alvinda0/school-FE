@@ -11,11 +11,22 @@ import { subjectService } from "@/services/subject.service";
 import { Subject } from "@/types/subject";
 import { format } from "date-fns";
 import { ActionDropdown } from "@/components/ActionDropdown";
+import { SubjectDetailModal } from "@/components/SubjectDetailModal";
+import { EditSubjectModal } from "@/components/EditSubjectModal";
+import { CreateSubjectModal } from "@/components/CreateSubjectModal";
+import { DeleteSubjectModal } from "@/components/DeleteSubjectModal";
 
 const SubjectsPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedSubjectForEdit, setSelectedSubjectForEdit] = useState<Subject | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedSubjectForDelete, setSelectedSubjectForDelete] = useState<Subject | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Fetch subjects data
   const { data, isLoading, error, refetch } = useQuery({
@@ -37,6 +48,24 @@ const SubjectsPage = () => {
   const handlePerRowsChange = (newPerPage: number) => {
     setPerPage(newPerPage);
     setPage(1);
+  };
+
+  // Handle view subject
+  const handleViewSubject = (subjectId: string) => {
+    setSelectedSubjectId(subjectId);
+    setIsModalOpen(true);
+  };
+
+  // Handle edit subject
+  const handleEditSubject = (subject: Subject) => {
+    setSelectedSubjectForEdit(subject);
+    setIsEditModalOpen(true);
+  };
+
+  // Handle delete subject
+  const handleDeleteSubject = (subject: Subject) => {
+    setSelectedSubjectForDelete(subject);
+    setIsDeleteModalOpen(true);
   };
 
   // Table columns
@@ -92,17 +121,17 @@ const SubjectsPage = () => {
             {
               label: "Lihat",
               icon: <Eye className="w-4 h-4" />,
-              onClick: () => router.push(`/subjects/${row.id}`),
+              onClick: () => handleViewSubject(row.id),
             },
             {
               label: "Edit",
               icon: <Edit className="w-4 h-4" />,
-              onClick: () => router.push(`/subjects/${row.id}/edit`),
+              onClick: () => handleEditSubject(row),
             },
             {
               label: "Hapus",
               icon: <Trash2 className="w-4 h-4" />,
-              onClick: () => console.log("Delete", row.id),
+              onClick: () => handleDeleteSubject(row),
               className: "text-red-600 hover:bg-red-50",
             },
           ]}
@@ -123,7 +152,7 @@ const SubjectsPage = () => {
             Kelola semua mata pelajaran di sekolah
           </p>
         </div>
-        <Button className="gap-2" onClick={() => router.push("/subjects/create")}>
+        <Button className="gap-2" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="h-4 w-4" />
           Tambah Mata Pelajaran
         </Button>
@@ -142,6 +171,33 @@ const SubjectsPage = () => {
         onChangeRowsPerPage={handlePerRowsChange}
         paginationPerPage={perPage}
         paginationRowsPerPageOptions={[10, 20, 30, 50, 100]}
+      />
+
+      {/* Create Subject Modal */}
+      <CreateSubjectModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
+
+      {/* Subject Detail Modal */}
+      <SubjectDetailModal
+        subjectId={selectedSubjectId}
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+      />
+
+      {/* Edit Subject Modal */}
+      <EditSubjectModal
+        subject={selectedSubjectForEdit}
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
+
+      {/* Delete Subject Modal */}
+      <DeleteSubjectModal
+        subject={selectedSubjectForDelete}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
       />
     </div>
   );

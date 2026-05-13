@@ -10,6 +10,15 @@ export interface User {
   updated_at: string;
 }
 
+export interface Subject {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Teacher {
   id: string;
   user_id: string;
@@ -25,6 +34,7 @@ export interface Teacher {
   created_at: string;
   updated_at: string;
   user: User;
+  subjects?: Subject[];
 }
 
 export interface CreateTeacherPayload {
