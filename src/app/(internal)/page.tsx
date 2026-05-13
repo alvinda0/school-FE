@@ -1,0 +1,18 @@
+// app/(internal)/page.tsx
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
+const InternalRootPage = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect /internal to /dashboard
+    router.replace("/dashboard");
+  }, [router]);
+
+  return null;
+};
+
+export default InternalRootPage;
