@@ -115,7 +115,7 @@ const ForgotResetPasswordPage = () => {
       setSuccess(true);
       toast.success("Password reset successfully! Redirecting to login...");
       setTimeout(() => {
-        router.push("/auth/login");
+        router.push("/login");
       }, 2000);
     } catch (err) {
       const errorMessage = getErrorMessage(err);
@@ -420,7 +420,7 @@ const ForgotResetPasswordPage = () => {
           {/* Back to Login Link */}
           <div className="mt-6">
             <Link
-              href="/auth/login"
+              href="/login"
               className="flex items-center justify-center text-sm text-gray-400 hover:text-white transition-colors group"
             >
               <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />

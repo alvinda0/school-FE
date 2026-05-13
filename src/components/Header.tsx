@@ -91,11 +91,11 @@ const Header = () => {
       setIsLoggingOut(true);
       authService.logout();
       queryClient.clear(); // Clear all React Query cache
-      router.push("/auth/login");
+      router.push("/login");
     } catch (error) {
       console.error("Logout error:", error);
       queryClient.clear(); // Clear cache even on error
-      router.push("/auth/login");
+      router.push("/login");
     } finally {
       setIsLoggingOut(false);
     }

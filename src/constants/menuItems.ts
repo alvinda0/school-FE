@@ -122,7 +122,7 @@ export const EXTERNAL_MENU_ITEMS: MenuItem[] = [
   {
     name: "home",
     title: "Home",
-    href: "/home",
+    href: "/dashboard",
     icon: Home,
     roles: ["student", "candidate"],
   },

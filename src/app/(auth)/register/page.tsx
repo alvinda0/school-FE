@@ -98,7 +98,7 @@ const RegisterPage = () => {
       });
       
       toast.success("Registrasi berhasil! Silakan login.");
-      router.push("/auth/login");
+      router.push("/login");
     } catch (err) {
       const errorMessage = getErrorMessage(err);
       toast.error(errorMessage);
@@ -408,7 +408,7 @@ const RegisterPage = () => {
                 <p className="text-slate-400 text-sm">
                   Sudah punya akun?{" "}
                   <Link
-                    href="/auth/login"
+                    href="/login"
                     className="text-blue-400 hover:text-blue-300 font-semibold transition-colors hover:underline"
                   >
                     Masuk di sini

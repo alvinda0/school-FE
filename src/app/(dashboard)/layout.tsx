@@ -1,4 +1,4 @@
-// app/(dashboard)/layout.tsx
+// app/dashboard/layout.tsx
 "use client";
 
 import React, { useEffect } from "react";
@@ -34,14 +34,14 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
     if (!token) {
       queryClient.clear();
-      router.replace("/auth/login");
+      router.replace("/login");
       return;
     }
 
     if (!isLoading && (isError || !user)) {
       queryClient.clear();
       localStorage.removeItem("token");
-      router.replace("/auth/login");
+      router.replace("/login");
     }
   }, [isLoading, isError, user, router, queryClient]);
 

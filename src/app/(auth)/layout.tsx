@@ -1,4 +1,4 @@
-// app/auth/layout.tsx
+// app/(auth)/layout.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";

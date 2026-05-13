@@ -107,7 +107,7 @@ class AuthService {
     if (this.isInternalUser(user)) {
       return '/dashboard'
     }
-    return '/home'
+    return '/dashboard'
   }
 
   async forgotPassword(payload: ForgotPasswordPayload): Promise<string> {

@@ -39,7 +39,7 @@ const LoginPage = () => {
       if (authService.isInternalUser(userData)) {
         router.push("/dashboard");
       } else {
-        router.push("/home");
+        router.push("/dashboard");
       }
     } catch (err) {
       const errorMessage = getErrorMessage(err);
@@ -120,7 +120,7 @@ const LoginPage = () => {
               {/* Forgot Password Link */}
               <div className="text-right mt-2">
                 <Link
-                  href="/auth/forgot-password"
+                  href="/forgot-password"
                   className="text-sm text-blue-600 hover:text-blue-700 transition-colors hover:underline"
                 >
                   Lupa Password?
@@ -152,7 +152,7 @@ const LoginPage = () => {
               <p className="text-gray-600 text-sm">
                 Belum punya akun?{" "}
                 <Link
-                  href="/auth/register"
+                  href="/register"
                   className="text-blue-600 hover:text-blue-700 font-semibold transition-colors hover:underline"
                 >
                   Daftar Sekarang
