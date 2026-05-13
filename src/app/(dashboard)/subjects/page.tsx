@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Plus, Eye, Edit, Trash2 } from "lucide-react";
+import { Plus, Eye, Edit, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomDataTable from "@/components/CustomDataTable";
 import { subjectService } from "@/services/subject.service";
@@ -85,11 +85,50 @@ const SubjectsPage = () => {
       minWidth: "200px",
     },
     {
+      name: "Guru Pengajar",
+      selector: (row: Subject) => row.teachers?.length || 0,
+      sortable: true,
+      grow: 1.5,
+      minWidth: "180px",
+      cell: (row: Subject) => {
+        if (!row.teachers || row.teachers.length === 0) {
+          return (
+            <span className="text-sm text-gray-400 italic">
+              Belum ada guru
+            </span>
+          );
+        }
+        
+        if (row.teachers.length === 1) {
+          return (
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-600" />
+              <span className="text-sm text-gray-700">
+                {row.teachers[0].name}
+              </span>
+            </div>
+          );
+        }
+        
+        return (
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-blue-600" />
+            <span className="text-sm text-gray-700">
+              {row.teachers[0].name}
+            </span>
+            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+              +{row.teachers.length - 1}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       name: "Deskripsi",
       selector: (row: Subject) => row.description || "-",
       sortable: true,
-      grow: 2.5,
-      minWidth: "250px",
+      grow: 2,
+      minWidth: "200px",
       cell: (row: Subject) => (
         <span className="text-sm text-gray-600">
           {row.description || "-"}

@@ -32,6 +32,7 @@ import {
   FolderTree,
   Trash2,
   ShoppingBag,
+  School,
 } from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -95,6 +96,15 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
     title: "Mata Pelajaran",
     href: "/subjects",
     icon: BookIcon,
+    roles: ["super_admin", "admin", "teacher"],
+  },
+
+  // === CLASSES ===
+  {
+    name: "classes",
+    title: "Kelas",
+    href: "/classes",
+    icon: School,
     roles: ["super_admin", "admin", "teacher"],
   },
 

@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash2, BookOpen, Calendar } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, BookOpen, Calendar, Users } from "lucide-react";
 import { subjectService } from "@/services/subject.service";
 import { format } from "date-fns";
 import LoadingState from "@/components/LoadingState";
@@ -100,6 +100,41 @@ const SubjectDetailPage = () => {
                 </p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Teachers */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Guru Pengajar
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {subject.teachers && subject.teachers.length > 0 ? (
+              <div className="space-y-2">
+                {subject.teachers.map((teacher) => (
+                  <div
+                    key={teacher.id}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">{teacher.name}</p>
+                      <p className="text-sm text-gray-500">ID: {teacher.id}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">
+                <Users className="h-12 w-12 mx-auto mb-2 text-gray-400" />
+                <p>Belum ada guru yang mengajar mata pelajaran ini</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

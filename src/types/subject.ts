@@ -1,5 +1,10 @@
 // types/subject.ts
 
+export interface Teacher {
+  id: string;
+  name: string;
+}
+
 export interface Subject {
   id: string;
   name: string;
@@ -7,6 +12,7 @@ export interface Subject {
   description?: string;
   created_at: string;
   updated_at: string;
+  teachers?: Teacher[];
 }
 
 export interface CreateSubjectPayload {
