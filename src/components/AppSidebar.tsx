@@ -25,13 +25,12 @@ interface AppSidebarProps {
   activeItem?: string;
 }
 
-const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
+const AppSidebar = ({ activeItem = "" }: AppSidebarProps) => {
   const pathname = usePathname();
   const [openMenus, setOpenMenus] = useState<string[]>([]);
-  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const { data: user } = useAuthMe();
   const { state } = useSidebar();
-  const { 
+  const {
     sidebarPrimary,
     sidebarForeground,
     sidebarPrimaryForeground,
@@ -40,11 +39,14 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
   } = useTheme();
 
   const userRole = user?.role_name || "";
-  const isInternalUser = user ? ['super_admin', 'admin', 'teacher'].includes(user.role_name.toLowerCase()) : false;
-  
-  // Use INTERNAL_MENU_ITEMS for internal users, MENU_ITEMS for external users
-  const filteredMenuItems = isInternalUser 
-    ? getFilteredMenuItems(userRole, true) 
+  const isInternalUser = user
+    ? ["super_admin", "admin", "teacher"].includes(
+        user.role_name.toLowerCase()
+      )
+    : false;
+
+  const filteredMenuItems = isInternalUser
+    ? getFilteredMenuItems(userRole, true)
     : getFilteredMenuItems(userRole);
 
   const toggleMenu = (menuName: string) => {
@@ -59,7 +61,10 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
     return pathname.startsWith(submenuHref);
   };
 
-  const shouldMenuBeOpen = (menuName: string, submenu?: Array<{ href: string }>) => {
+  const shouldMenuBeOpen = (
+    menuName: string,
+    submenu?: Array<{ href: string }>
+  ) => {
     if (openMenus.includes(menuName)) return true;
     if (submenu) {
       return submenu.some((sub) => isSubmenuActive(sub.href));
@@ -67,70 +72,30 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
     return false;
   };
 
-  const getMenuStyle = (isActive: boolean, menuKey: string) => {
-    if (isActive) {
-      return {
-        backgroundColor: sidebarPrimary,
-        color: sidebarPrimaryForeground,
-      };
-    }
-    
-    if (hoveredMenu === menuKey) {
-      return {
-        backgroundColor: `${sidebarPrimary}80`,
-        color: sidebarPrimaryForeground,
-      };
-    }
-
-    return {
-      color: sidebarForeground,
-      backgroundColor: "transparent",
-    };
-  };
-
-  const getSubmenuStyle = (isActive: boolean, menuKey: string) => {
-    if (isActive) {
-      return {
-        backgroundColor: `${sidebarPrimary}dd`,
-        color: sidebarPrimaryForeground,
-      };
-    }
-    
-    if (hoveredMenu === menuKey) {
-      return {
-        backgroundColor: `${sidebarPrimary}60`,
-        color: sidebarPrimaryForeground,
-      };
-    }
-
-    return {
-      color: sidebarForeground,
-      backgroundColor: "transparent",
-    };
-  };
-
-  const getIconColor = (isActive: boolean, menuKey: string) => {
-    if (isActive) {
-      return sidebarPrimaryForeground;
-    }
-    
-    if (hoveredMenu === menuKey) {
-      return sidebarPrimaryForeground;
-    }
-
-    return sidebarForeground;
-  };
+  const isCollapsed = state === "collapsed";
 
   return (
-    <Sidebar 
-      className="border-r bg-white"
+    <Sidebar
+      className="border-r"
       collapsible="icon"
+      style={
+        {
+          // Override shadcn CSS variables dengan warna dari theme
+          "--sidebar": "#f8f9fa",
+          "--sidebar-foreground": sidebarForeground,
+          "--sidebar-primary": sidebarPrimary,
+          "--sidebar-primary-foreground": sidebarPrimaryForeground,
+          // accent = warna active/hover item
+          "--sidebar-accent": sidebarPrimary,
+          "--sidebar-accent-foreground": sidebarPrimaryForeground,
+          "--sidebar-border": "#e2e8f0",
+        } as React.CSSProperties
+      }
     >
-      <SidebarHeader 
+      {/* ── Header (unchanged) ── */}
+      <SidebarHeader
         className="border-b group-data-[collapsible=icon]:px-2 group-data-[collapsible=icon]:py-3 px-4 py-4"
-        style={{ 
-          backgroundColor: sidebarHeaderPrimary,
-        }}
+        style={{ backgroundColor: sidebarHeaderPrimary }}
       >
         {/* Expanded state */}
         <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:hidden">
@@ -138,9 +103,14 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
             className="h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ backgroundColor: sidebarHeaderForeground }}
           >
-            <span className="font-bold text-base" style={{ color: sidebarHeaderPrimary }}>SI</span>
+            <span
+              className="font-bold text-base"
+              style={{ color: sidebarHeaderPrimary }}
+            >
+              SI
+            </span>
           </div>
-          <h2 
+          <h2
             className="text-lg font-bold"
             style={{ color: sidebarHeaderForeground }}
           >
@@ -157,51 +127,51 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
             className="h-8 w-8 rounded-lg flex items-center justify-center"
             style={{ backgroundColor: sidebarHeaderForeground }}
           >
-            <span className="font-bold text-sm" style={{ color: sidebarHeaderPrimary }}>SI</span>
+            <span
+              className="font-bold text-sm"
+              style={{ color: sidebarHeaderPrimary }}
+            >
+              SI
+            </span>
           </div>
           <SidebarTrigger className="h-6 w-6" />
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-3 py-3">
-        <SidebarMenu className="gap-0.5">
+      {/* ── Menu ── */}
+      <SidebarContent className="px-3 py-4">
+        <SidebarMenu className="gap-1">
           {filteredMenuItems.map((item) => {
             const isActive = activeItem === item.name;
             const hasSubmenu = item.submenu && item.submenu.length > 0;
             const isMenuOpen = shouldMenuBeOpen(item.name, item.submenu);
-            const menuKey = `menu-${item.name}`;
+            const isHighlighted = isActive || isMenuOpen;
 
             return (
               <SidebarMenuItem key={item.name}>
                 {hasSubmenu ? (
                   <>
                     <SidebarMenuButton
+                      isActive={isHighlighted}
                       onClick={() => toggleMenu(item.name)}
-                      onMouseEnter={() => setHoveredMenu(menuKey)}
-                      onMouseLeave={() => setHoveredMenu(null)}
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all"
-                      style={getMenuStyle(isActive || isMenuOpen, menuKey)}
-                      tooltip={state === "collapsed" ? item.title : undefined}
+                      className="h-auto px-4 py-3 rounded-2xl text-[15px] font-bold gap-3 [&>svg]:size-5"
+                      tooltip={isCollapsed ? item.title : undefined}
                     >
-                      <item.icon 
-                        className="h-5 w-5 flex-shrink-0"
-                        style={{ color: getIconColor(isActive || isMenuOpen, menuKey) }}
-                      />
-                      <span className="text-sm font-medium flex-1">
-                        {item.title}
-                      </span>
+                      <item.icon />
+                      <span className="flex-1 text-left">{item.title}</span>
                       <ChevronDown
-                        className={`h-4 w-4 transition-transform ${
+                        className={`!size-4 transition-transform duration-200 ${
                           isMenuOpen ? "rotate-180" : ""
                         }`}
-                        style={{ color: getIconColor(isActive || isMenuOpen, menuKey) }}
                       />
                     </SidebarMenuButton>
 
                     {isMenuOpen && (
-                      <SidebarMenuSub className="mt-1 ml-4 space-y-1">
+                      <SidebarMenuSub
+                        className="mt-0.5 ml-4 pl-3 border-l-2 space-y-0.5"
+                        style={{ borderColor: `${sidebarPrimary}40` }}
+                      >
                         {item.submenu?.map((subItem) => {
-                          const subMenuKey = `submenu-${subItem.name}`;
                           const isSubActive = isSubmenuActive(subItem.href);
 
                           return (
@@ -209,19 +179,10 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
                               <SidebarMenuSubButton
                                 asChild
                                 isActive={isSubActive}
-                                className="py-2 text-sm font-medium rounded-lg transition-all"
-                                onMouseEnter={() => setHoveredMenu(subMenuKey)}
-                                onMouseLeave={() => setHoveredMenu(null)}
-                                style={getSubmenuStyle(isSubActive, subMenuKey)}
+                                className="h-auto px-3 py-2.5 rounded-xl text-[14px] font-semibold gap-3 [&>svg]:size-4"
                               >
-                                <Link
-                                  href={subItem.href}
-                                  className="flex items-center gap-3 w-full"
-                                >
-                                  <subItem.icon 
-                                    className="h-4 w-4"
-                                    style={{ color: getIconColor(isSubActive, subMenuKey) }}
-                                  />
+                                <Link href={subItem.href}>
+                                  <subItem.icon />
                                   <span>{subItem.title}</span>
                                 </Link>
                               </SidebarMenuSubButton>
@@ -234,18 +195,13 @@ const AppSidebar = ({ activeItem = "Dashboard" }: AppSidebarProps) => {
                 ) : (
                   <SidebarMenuButton
                     asChild
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all"
-                    onMouseEnter={() => setHoveredMenu(menuKey)}
-                    onMouseLeave={() => setHoveredMenu(null)}
-                    style={getMenuStyle(isActive, menuKey)}
-                    tooltip={state === "collapsed" ? item.title : undefined}
+                    isActive={isActive}
+                    className="h-auto px-4 py-3 rounded-2xl text-[15px] font-bold gap-3 [&>svg]:size-5"
+                    tooltip={isCollapsed ? item.title : undefined}
                   >
-                    <Link href={item.href} className="flex items-center gap-3 w-full">
-                      <item.icon 
-                        className="h-5 w-5 flex-shrink-0"
-                        style={{ color: getIconColor(isActive, menuKey) }}
-                      />
-                      <span className="text-sm font-medium">{item.title}</span>
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 )}

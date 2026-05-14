@@ -45,8 +45,12 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
     }
   }, [isLoading, isError, user, router, queryClient]);
 
-  const { menuItem } = getMenuItemByPath(pathname);
-  const activeMenuName = menuItem?.name || "Dashboard";
+  const isInternalUser = user
+    ? ["super_admin", "admin", "teacher"].includes(user.role_name.toLowerCase())
+    : false;
+
+  const { menuItem } = getMenuItemByPath(pathname, isInternalUser);
+  const activeMenuName = menuItem?.name || "";
 
   if (isLoading || isError || !user || sidebarOpen === undefined) {
     return null;
