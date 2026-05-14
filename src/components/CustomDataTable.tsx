@@ -45,7 +45,6 @@ const useCustomStyles = (
       },
       "&:hover": {
         backgroundColor: `${primaryTableColor}10`,
-        cursor: "pointer",
       },
     },
   },

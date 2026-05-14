@@ -354,7 +354,7 @@ const AuditLogsPage = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 w-8 p-0"
+          className="h-8 w-8 p-0 cursor-pointer"
           onClick={() => handleView(row)}
         >
           <Eye className="w-4 h-4" />
