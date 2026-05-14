@@ -112,7 +112,7 @@ export const INTERNAL_MENU_ITEMS: MenuItem[] = [
   {
     name: "audit-internal",
     title: "Audit Log",
-    href: "/audit",
+    href: "/audit-logs",
     icon: BookDashed,
     roles: ["super_admin", "admin"],
   },
