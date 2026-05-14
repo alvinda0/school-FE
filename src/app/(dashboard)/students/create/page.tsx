@@ -31,7 +31,7 @@ const CreateStudentPage = () => {
     user_id: "",
     nis: "",
     nisn: "",
-    gender: "MALE",
+    gender: "Laki-laki",
     birth_place: "",
     birth_date: "",
     religion: "",
@@ -194,14 +194,14 @@ const CreateStudentPage = () => {
                 </Label>
                 <Select
                   value={formData.gender}
-                  onValueChange={(value) => handleChange("gender", value as "MALE" | "FEMALE")}
+                  onValueChange={(value) => handleChange("gender", value as "Laki-laki" | "Perempuan")}
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MALE">Laki-laki</SelectItem>
-                    <SelectItem value="FEMALE">Perempuan</SelectItem>
+                    <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                    <SelectItem value="Perempuan">Perempuan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

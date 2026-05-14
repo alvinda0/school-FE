@@ -15,6 +15,8 @@ import { SubjectDetailModal } from "@/components/SubjectDetailModal";
 import { EditSubjectModal } from "@/components/EditSubjectModal";
 import { CreateSubjectModal } from "@/components/CreateSubjectModal";
 import { DeleteSubjectModal } from "@/components/DeleteSubjectModal";
+import { TeachersListModal } from "@/components/TeachersListModal";
+import { Teacher } from "@/types/subject";
 
 const SubjectsPage = () => {
   const router = useRouter();
@@ -27,6 +29,9 @@ const SubjectsPage = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedSubjectForDelete, setSelectedSubjectForDelete] = useState<Subject | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isTeachersModalOpen, setIsTeachersModalOpen] = useState(false);
+  const [selectedTeachers, setSelectedTeachers] = useState<Teacher[]>([]);
+  const [selectedSubjectNameForTeachers, setSelectedSubjectNameForTeachers] = useState("");
 
   // Fetch subjects data
   const { data, isLoading, error, refetch } = useQuery({
@@ -66,6 +71,13 @@ const SubjectsPage = () => {
   const handleDeleteSubject = (subject: Subject) => {
     setSelectedSubjectForDelete(subject);
     setIsDeleteModalOpen(true);
+  };
+
+  // Handle view teachers list
+  const handleViewTeachers = (subject: Subject) => {
+    setSelectedTeachers(subject.teachers || []);
+    setSelectedSubjectNameForTeachers(subject.name);
+    setIsTeachersModalOpen(true);
   };
 
   // Table columns
@@ -111,15 +123,15 @@ const SubjectsPage = () => {
         }
         
         return (
-          <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-blue-600" />
-            <span className="text-sm text-gray-700">
-              {row.teachers[0].name}
+          <button
+            onClick={() => handleViewTeachers(row)}
+            className="flex items-center gap-2 px-2 py-1 rounded-md border border-blue-200 bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer"
+          >
+            <Users className="w-4 h-4 text-blue-600 flex-shrink-0" />
+            <span className="text-sm text-blue-700 font-medium">
+              {row.teachers.length} Guru
             </span>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-              +{row.teachers.length - 1}
-            </span>
-          </div>
+          </button>
         );
       },
     },
@@ -237,6 +249,14 @@ const SubjectsPage = () => {
         subject={selectedSubjectForDelete}
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
+      />
+
+      {/* Teachers List Modal */}
+      <TeachersListModal
+        open={isTeachersModalOpen}
+        onOpenChange={setIsTeachersModalOpen}
+        subjectName={selectedSubjectNameForTeachers}
+        teachers={selectedTeachers}
       />
     </div>
   );

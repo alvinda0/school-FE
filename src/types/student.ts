@@ -25,7 +25,7 @@ export interface CreateStudentPayload {
   user_id: string;
   nis: string;
   nisn: string;
-  gender: "MALE" | "FEMALE";
+  gender: "Laki-laki" | "Perempuan";
   birth_place: string;
   birth_date: string;
   religion: string;
@@ -41,7 +41,7 @@ export interface CreateStudentPayload {
 export interface UpdateStudentPayload {
   nis: string;
   nisn: string;
-  gender: "MALE" | "FEMALE";
+  gender: "Laki-laki" | "Perempuan";
   birth_place: string;
   birth_date: string;
   religion: string;

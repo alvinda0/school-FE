@@ -33,7 +33,7 @@ const EditStudentPage = () => {
   const [formData, setFormData] = useState<UpdateStudentPayload>({
     nis: "",
     nisn: "",
-    gender: "MALE",
+    gender: "Laki-laki",
     birth_place: "",
     birth_date: "",
     religion: "",
@@ -58,16 +58,10 @@ const EditStudentPage = () => {
   // Populate form when data is loaded
   useEffect(() => {
     if (student) {
-      // Convert gender from Indonesian to English
-      const genderMap: Record<string, "MALE" | "FEMALE"> = {
-        "Laki-laki": "MALE",
-        "Perempuan": "FEMALE",
-      };
-
       setFormData({
         nis: student.nis,
         nisn: student.nisn,
-        gender: genderMap[student.gender] || "MALE",
+        gender: student.gender,
         birth_place: student.birth_place,
         birth_date: student.birth_date.split("T")[0], // Extract date only
         religion: student.religion,
@@ -218,15 +212,15 @@ const EditStudentPage = () => {
                 <Select
                   value={formData.gender}
                   onValueChange={(value) =>
-                    handleChange("gender", value as "MALE" | "FEMALE")
+                    handleChange("gender", value as "Laki-laki" | "Perempuan")
                   }
                 >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="MALE">Laki-laki</SelectItem>
-                    <SelectItem value="FEMALE">Perempuan</SelectItem>
+                    <SelectItem value="Laki-laki">Laki-laki</SelectItem>
+                    <SelectItem value="Perempuan">Perempuan</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
