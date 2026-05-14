@@ -1,6 +1,6 @@
 // services/class.service.ts
 import { apiClient } from "@/lib/axios";
-import { ClassesResponse, ClassDetailResponse, ClassFilters, CreateClassPayload, UpdateClassPayload } from "@/types/class";
+import { ClassesResponse, ClassDetailResponse, ClassFilters, CreateClassPayload, UpdateClassPayload, ClassStudentsResponse, ClassWithTeacherResponse } from "@/types/class";
 
 export const classService = {
   // Get all classes
@@ -27,6 +27,12 @@ export const classService = {
     return response.data;
   },
 
+  // Get class with homeroom teacher details
+  getClassWithTeacher: async (id: string): Promise<ClassWithTeacherResponse> => {
+    const response = await apiClient.get<ClassWithTeacherResponse>(`/api/v1/classes/${id}/teacher`);
+    return response.data;
+  },
+
   // Create new class
   createClass: async (data: CreateClassPayload) => {
     const response = await apiClient.post("/api/v1/classes", data);
@@ -42,6 +48,26 @@ export const classService = {
   // Delete class
   deleteClass: async (id: string) => {
     const response = await apiClient.delete(`/api/v1/classes/${id}`);
+    return response.data;
+  },
+
+  // Get students in a class
+  getStudentsByClass: async (classId: string): Promise<ClassStudentsResponse> => {
+    const response = await apiClient.get<ClassStudentsResponse>(`/api/v1/classes/${classId}/students`);
+    return response.data;
+  },
+
+  // Add students to a class
+  addStudentsToClass: async (classId: string, studentIds: string[]) => {
+    const response = await apiClient.post(`/api/v1/classes/${classId}/students`, {
+      student_ids: studentIds,
+    });
+    return response.data;
+  },
+
+  // Remove student from a class
+  removeStudentFromClass: async (classId: string, studentId: string) => {
+    const response = await apiClient.delete(`/api/v1/classes/${classId}/students/${studentId}`);
     return response.data;
   },
 };

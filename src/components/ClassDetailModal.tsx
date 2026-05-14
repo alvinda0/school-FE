@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { School, Calendar, Users, BookOpen } from "lucide-react";
+import { School, Calendar, Users, User, Phone, MapPin } from "lucide-react";
 import { classService } from "@/services/class.service";
 import { format } from "date-fns";
 import LoadingState from "@/components/LoadingState";
@@ -26,12 +26,13 @@ export function ClassDetailModal({
   onOpenChange,
 }: ClassDetailModalProps) {
   const { data, isLoading } = useQuery({
-    queryKey: ["class", classId],
-    queryFn: () => classService.getClassById(classId!),
+    queryKey: ["class-with-teacher", classId],
+    queryFn: () => classService.getClassWithTeacher(classId!),
     enabled: !!classId && open,
   });
 
   const classData = data?.data;
+  const teacher = classData?.homeroom_teacher;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,63 +45,37 @@ export function ClassDetailModal({
         </DialogHeader>
 
         {isLoading ? (
-          <LoadingState message="Loading class details..." />
+          <LoadingState message="Memuat detail kelas..." />
         ) : classData ? (
           <div className="space-y-6">
             {/* Class Information */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <School className="h-5 w-5" />
+            <div className="space-y-3">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <School className="h-4 w-4" />
                 Informasi Kelas
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Nama Kelas
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Nama Kelas</label>
                   <p className="text-base font-semibold">{classData.name}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Tingkat Kelas
-                  </label>
-                  <p className="text-base font-semibold">
-                    Kelas {classData.grade_level}
-                  </p>
+                  <label className="text-sm font-medium text-gray-500">Tingkat Kelas</label>
+                  <p className="text-base font-semibold">Kelas {classData.grade_level}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Tahun Ajaran
-                  </label>
-                  <p className="text-base font-semibold">
-                    {classData.academic_year}
-                  </p>
+                  <label className="text-sm font-medium text-gray-500">Tahun Ajaran</label>
+                  <p className="text-base font-semibold">{classData.academic_year}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Kapasitas Maksimal
-                  </label>
-                  <p className="text-base font-semibold">
-                    {classData.max_students} siswa
-                  </p>
+                  <label className="text-sm font-medium text-gray-500">Kapasitas Maksimal</label>
+                  <p className="text-base font-semibold">{classData.max_students} siswa</p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Wali Kelas
-                  </label>
-                  <p className="text-base font-semibold">
-                    {classData.homeroom_teacher_name || "-"}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Status
-                  </label>
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-gray-500">Status</label>
                   <div className="mt-1">
                     <Badge
-                      variant={
-                        classData.status === "ACTIVE" ? "default" : "secondary"
-                      }
+                      variant={classData.status === "ACTIVE" ? "default" : "secondary"}
                       className={
                         classData.status === "ACTIVE"
                           ? "bg-green-100 text-green-800 hover:bg-green-100"
@@ -114,66 +89,79 @@ export function ClassDetailModal({
               </div>
             </div>
 
-            {/* Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="h-5 w-5 text-blue-600" />
+            {/* Homeroom Teacher */}
+            <div className="space-y-3 pt-4 border-t">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Wali Kelas
+              </h3>
+              {teacher ? (
+                <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">NIP</label>
+                    <p className="text-base font-semibold">{teacher.nip}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Siswa</p>
-                    <p className="text-xl font-bold">0</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-green-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <BookOpen className="h-5 w-5 text-green-600" />
+                    <label className="text-sm font-medium text-gray-500">Jenis Kelamin</label>
+                    <p className="text-base">{teacher.gender || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Mata Pelajaran</p>
-                    <p className="text-xl font-bold">0</p>
+                    <label className="text-sm font-medium text-gray-500">Status</label>
+                    <div className="mt-1">
+                      <Badge
+                        variant={teacher.status === "ACTIVE" ? "default" : "secondary"}
+                        className={
+                          teacher.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800 hover:bg-green-100"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                        }
+                      >
+                        {teacher.status === "ACTIVE" ? "Aktif" : "Tidak Aktif"}
+                      </Badge>
+                    </div>
                   </div>
+                  {teacher.phone_number && (
+                    <div className="flex items-start gap-2">
+                      <Phone className="h-4 w-4 text-gray-400 mt-0.5" />
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Telepon</label>
+                        <p className="text-base">{teacher.phone_number}</p>
+                      </div>
+                    </div>
+                  )}
+                  {teacher.address && (
+                    <div className="flex items-start gap-2 md:col-span-2">
+                      <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Alamat</label>
+                        <p className="text-base">{teacher.address}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <Users className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Wali Kelas</p>
-                    <p className="text-xl font-bold">
-                      {classData.homeroom_teacher_name || "-"}
-                    </p>
-                  </div>
+              ) : (
+                <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg text-gray-500">
+                  <Users className="h-5 w-5" />
+                  <p className="text-sm">Belum ada wali kelas yang ditugaskan</p>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Metadata */}
-            <div className="space-y-4 pt-4 border-t">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
+            <div className="space-y-3 pt-4 border-t">
+              <h3 className="font-semibold text-base flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
                 Informasi Rekaman
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Dibuat Pada
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Dibuat Pada</label>
                   <p className="text-base">
                     {format(new Date(classData.created_at), "dd MMMM yyyy, HH:mm")}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">
-                    Terakhir Diperbarui
-                  </label>
+                  <label className="text-sm font-medium text-gray-500">Terakhir Diperbarui</label>
                   <p className="text-base">
                     {format(new Date(classData.updated_at), "dd MMMM yyyy, HH:mm")}
                   </p>

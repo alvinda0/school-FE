@@ -4,7 +4,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Eye, Edit, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import CustomDataTable from "@/components/CustomDataTable";
@@ -13,14 +12,23 @@ import { Student } from "@/types/student";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { ActionDropdown } from "@/components/ActionDropdown";
+import { CreateStudentModal } from "@/components/CreateStudentModal";
+import { EditStudentModal } from "@/components/EditStudentModal";
+import { DeleteStudentModal } from "@/components/DeleteStudentModal";
 
 const StudentsPage = () => {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedStudentForEdit, setSelectedStudentForEdit] = useState<Student | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedStudentForDelete, setSelectedStudentForDelete] = useState<Student | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   // Fetch students data
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ["students"],
     queryFn: () => studentService.getStudents(),
   });
@@ -31,19 +39,25 @@ const StudentsPage = () => {
     page * perPage
   );
 
-  // Handle pagination
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
+  const handlePageChange = (newPage: number) => setPage(newPage);
   const handlePerRowsChange = (newPerPage: number) => {
     setPerPage(newPerPage);
     setPage(1);
   };
 
+  const handleEditStudent = (student: Student) => {
+    setSelectedStudentForEdit(student);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteStudent = (student: Student) => {
+    setSelectedStudentForDelete(student);
+    setIsDeleteModalOpen(true);
+  };
+
   // Status badge component
   const StatusBadge = ({ status }: { status: Student["status"] }) => {
-    const variants: Record<Student["status"], { variant: any; label: string }> = {
+    const variants: Record<Student["status"], { variant: "default" | "secondary" | "outline" | "destructive"; label: string }> = {
       ACTIVE: { variant: "default", label: "Active" },
       INACTIVE: { variant: "secondary", label: "Inactive" },
       GRADUATED: { variant: "outline", label: "Graduated" },
@@ -64,6 +78,22 @@ const StudentsPage = () => {
       minWidth: "100px",
     },
     {
+      name: "Full Name",
+      selector: (row: Student) => row.full_name || row.name || "-",
+      sortable: true,
+      grow: 1.5,
+      minWidth: "150px",
+      cell: (row: Student) => row.full_name || row.name || "-",
+    },
+    {
+      name: "Email",
+      selector: (row: Student) => row.email || "-",
+      sortable: true,
+      grow: 1.8,
+      minWidth: "200px",
+      cell: (row: Student) => row.email || "-",
+    },
+    {
       name: "NISN",
       selector: (row: Student) => row.nisn,
       sortable: true,
@@ -76,13 +106,6 @@ const StudentsPage = () => {
       sortable: true,
       grow: 0.8,
       minWidth: "100px",
-    },
-    {
-      name: "Birth Place",
-      selector: (row: Student) => row.birth_place,
-      sortable: true,
-      grow: 1,
-      minWidth: "130px",
     },
     {
       name: "Birth Date",
@@ -110,7 +133,7 @@ const StudentsPage = () => {
       selector: (row: Student) => row.status,
       sortable: true,
       grow: 0.7,
-      minWidth: "100px",
+      minWidth: "110px",
       center: true,
       cell: (row: Student) => <StatusBadge status={row.status} />,
     },
@@ -130,12 +153,12 @@ const StudentsPage = () => {
             {
               label: "Edit",
               icon: <Edit className="w-4 h-4" />,
-              onClick: () => router.push(`/students/${row.id}/edit`),
+              onClick: () => handleEditStudent(row),
             },
             {
               label: "Delete",
               icon: <Trash2 className="w-4 h-4" />,
-              onClick: () => console.log("Delete", row.id),
+              onClick: () => handleDeleteStudent(row),
               className: "text-red-600 hover:bg-red-50",
             },
           ]}
@@ -156,7 +179,7 @@ const StudentsPage = () => {
             Manage all students in the school
           </p>
         </div>
-        <Button className="gap-2" onClick={() => router.push("/students/create")}>
+        <Button className="gap-2" onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="h-4 w-4" />
           Add Student
         </Button>
@@ -175,6 +198,26 @@ const StudentsPage = () => {
         onChangeRowsPerPage={handlePerRowsChange}
         paginationPerPage={perPage}
         paginationRowsPerPageOptions={[10, 20, 30, 50, 100]}
+      />
+
+      {/* Create Student Modal */}
+      <CreateStudentModal
+        open={isCreateModalOpen}
+        onOpenChange={setIsCreateModalOpen}
+      />
+
+      {/* Edit Student Modal */}
+      <EditStudentModal
+        student={selectedStudentForEdit}
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+      />
+
+      {/* Delete Student Modal */}
+      <DeleteStudentModal
+        student={selectedStudentForDelete}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
       />
     </div>
   );

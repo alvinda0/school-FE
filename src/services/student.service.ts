@@ -5,7 +5,16 @@ import { StudentsResponse, StudentDetailResponse, StudentFilters } from "@/types
 export const studentService = {
   // Get all students
   getStudents: async (filters?: StudentFilters): Promise<StudentsResponse> => {
-    const response = await apiClient.get<StudentsResponse>("/api/v1/students");
+    const params = new URLSearchParams();
+    if (filters?.page) params.append("page", filters.page.toString());
+    if (filters?.limit) params.append("limit", filters.limit.toString());
+    if (filters?.search) params.append("search", filters.search);
+    if (filters?.status) params.append("status", filters.status);
+    if (filters?.gender) params.append("gender", filters.gender);
+
+    const queryString = params.toString();
+    const url = queryString ? `/api/v1/students?${queryString}` : "/api/v1/students";
+    const response = await apiClient.get<StudentsResponse>(url);
     return response.data;
   },
 

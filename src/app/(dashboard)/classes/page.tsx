@@ -3,7 +3,8 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Plus, Eye, Edit, Trash2, Filter } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Eye, Edit, Trash2, Filter, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CustomDataTable from "@/components/CustomDataTable";
@@ -36,6 +37,7 @@ const generateAcademicYears = () => {
 };
 
 const ClassesPage = () => {
+  const router = useRouter();
   const academicYears = generateAcademicYears();
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
@@ -101,6 +103,11 @@ const ClassesPage = () => {
   const handleDeleteClass = (classItem: Class) => {
     setSelectedClassForDelete(classItem);
     setIsDeleteModalOpen(true);
+  };
+
+  // Handle view students
+  const handleViewStudents = (classItem: Class) => {
+    router.push(`/classes/${classItem.id}/students`);
   };
 
   // Table columns
@@ -202,6 +209,11 @@ const ClassesPage = () => {
               label: "Lihat",
               icon: <Eye className="w-4 h-4" />,
               onClick: () => handleViewClass(row.id),
+            },
+            {
+              label: "Kelola Siswa",
+              icon: <Users className="w-4 h-4" />,
+              onClick: () => handleViewStudents(row),
             },
             {
               label: "Edit",

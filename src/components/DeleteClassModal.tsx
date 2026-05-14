@@ -20,12 +20,14 @@ interface DeleteClassModalProps {
   classData: Class | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onDeleteSuccess?: () => void;
 }
 
 export function DeleteClassModal({
   classData,
   open,
   onOpenChange,
+  onDeleteSuccess,
 }: DeleteClassModalProps) {
   const queryClient = useQueryClient();
 
@@ -35,6 +37,7 @@ export function DeleteClassModal({
       queryClient.invalidateQueries({ queryKey: ["classes"] });
       toast.success("Kelas berhasil dihapus");
       onOpenChange(false);
+      onDeleteSuccess?.();
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.message || "Gagal menghapus kelas");

@@ -1,22 +1,25 @@
 // app/(dashboard)/students/[id]/page.tsx
 "use client";
 
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter, useParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Edit, Trash2, User, Phone, MapPin, Calendar, School, Users } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, User, Phone, MapPin, Calendar, School, Users, Mail } from "lucide-react";
 import { studentService } from "@/services/student.service";
 import { Student } from "@/types/student";
 import { format } from "date-fns";
 import LoadingState from "@/components/LoadingState";
 import { ErrorState } from "@/components/ErrorState";
+import { DeleteStudentModal } from "@/components/DeleteStudentModal";
 
 const StudentDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const studentId = params.id as string;
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Fetch student detail
   const { data, isLoading, error } = useQuery({
@@ -28,7 +31,7 @@ const StudentDetailPage = () => {
 
   // Status badge component
   const StatusBadge = ({ status }: { status: Student["status"] }) => {
-    const variants: Record<Student["status"], { variant: any; label: string }> = {
+    const variants: Record<Student["status"], { variant: "default" | "secondary" | "outline" | "destructive"; label: string }> = {
       ACTIVE: { variant: "default", label: "Active" },
       INACTIVE: { variant: "secondary", label: "Inactive" },
       GRADUATED: { variant: "outline", label: "Graduated" },
@@ -73,15 +76,19 @@ const StudentDetailPage = () => {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="gap-2"
             onClick={() => router.push(`/students/${studentId}/edit`)}
           >
             <Edit className="h-4 w-4" />
             Edit
           </Button>
-          <Button variant="destructive" className="gap-2">
+          <Button
+            variant="destructive"
+            className="gap-2"
+            onClick={() => setIsDeleteModalOpen(true)}
+          >
             <Trash2 className="h-4 w-4" />
             Delete
           </Button>
@@ -100,6 +107,14 @@ const StudentDetailPage = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-gray-500">Full Name</label>
+                <p className="text-base font-semibold">{student.full_name || student.name || "-"}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Email</label>
+                <p className="text-base">{student.email || "-"}</p>
+              </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">NIS</label>
                 <p className="text-base font-semibold">{student.nis}</p>
@@ -142,6 +157,13 @@ const StudentDetailPage = () => {
             <CardTitle>Quick Info</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="flex items-start gap-3">
+              <Mail className="h-5 w-5 text-gray-500 mt-0.5" />
+              <div>
+                <label className="text-sm font-medium text-gray-500">Email</label>
+                <p className="text-base">{student.email || "-"}</p>
+              </div>
+            </div>
             <div className="flex items-start gap-3">
               <Phone className="h-5 w-5 text-gray-500 mt-0.5" />
               <div>
@@ -218,6 +240,14 @@ const StudentDetailPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Delete Student Modal */}
+      <DeleteStudentModal
+        student={student}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onDeleteSuccess={() => router.push("/students")}
+      />
     </div>
   );
 };
